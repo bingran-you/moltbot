@@ -100,6 +100,47 @@ pnpm openclaw onboard --install-daemon
 pnpm gateway:watch
 ```
 
+### Local setup (no sudo, reproducible)
+
+If `pnpm` is missing (or you want a user-only install), install it under `~/.local` and ensure the correct Node version is first on your `PATH`:
+
+```bash
+# Node must be >= 22.12.0
+node -v
+
+# (macOS Homebrew example) prefer the Homebrew Node when multiple nodes exist
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+
+# Install pnpm 10.23.0 without sudo
+npm config set prefix ~/.local
+npm i -g pnpm@10.23.0
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+Minimal non-interactive bootstrap (local gateway, no auth configured yet):
+
+```bash
+pnpm install
+pnpm ui:build
+pnpm build
+
+pnpm openclaw onboard \
+  --non-interactive \
+  --accept-risk \
+  --mode local \
+  --auth-choice skip \
+  --skip-channels \
+  --skip-skills \
+  --skip-health \
+  --skip-ui \
+  --no-install-daemon \
+  --gateway-port 18789
+
+pnpm openclaw gateway run --port 18789 --verbose --force
+```
+
+Tip: once the gateway is up, run `openclaw configure` (or `openclaw onboard` without `--non-interactive`) to add model credentials and channel setup.
+
 Note: `pnpm openclaw ...` runs TypeScript directly (via `tsx`). `pnpm build` produces `dist/` for running via Node / the packaged `openclaw` binary.
 
 ## Security defaults (DM access)
